@@ -1,13 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 import vision, recommend as rec, price as pr, nlp
-from detector import detect_material
 
-pred = detect_material(saved_image_path)
-if pred is None:
-    # no detection: tell the user, don't invent a material
-    return {"detected": False, "message": "No material found. Try a closer photo."}
-return {"detected": True, **pred}
 app = FastAPI(title="Reclaim Value AI Service")
 
 
@@ -22,6 +16,18 @@ class PriceIn(BaseModel):
 
 class TextIn(BaseModel):
     text: str
+
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    detection = vision.analyze(await file.read())
+    if detection["demo_mode"]:
+        return {
+            "detected": False,
+            "source": "heuristic",
+            "message": detection["fallback_reason"],
+        }
+    return {"detected": True, "source": "yolo", **detection}
 
 
 @app.get("/health")

@@ -100,8 +100,7 @@ function Agent({ onDone }) {
       {log.map((l, i) => <div key={i} className={`max-w-[90%] p-3 text-sm whitespace-pre-line ${l.me ? 'ml-auto bg-slab' : 'mr-auto bg-hivis/30'}`}>
         {!l.me && l.source && <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-rebar">
           {l.source === 'guide' ? 'Reclaim Value quick guide'
-            : l.source === 'action' ? 'Account action'
-              : l.source === 'huggingface' ? 'Hugging Face AI' : 'Gemini'}
+            : l.source === 'action' ? 'Account action' : 'Gemini AI'}
         </p>}
         {l.t}
       </div>)}

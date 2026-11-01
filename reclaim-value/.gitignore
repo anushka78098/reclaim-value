@@ -4,3 +4,7 @@ uploads
 __pycache__
 model.joblib
 dist
+.venv
+.pytest_cache
+ai-service/weights/*
+!ai-service/weights/.gitkeep

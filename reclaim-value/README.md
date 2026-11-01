@@ -26,16 +26,16 @@ Open http://localhost:5173, register as **Company** (supplier) and **Buyer** (us
 upload photo → AI analysis → save to inventory → publish listing → buyer searches in natural language → request → company accepts.
 
 ### AI-powered inventory assistant
-The Company dashboard assistant supports Hugging Face Inference Providers or Gemini. Set one provider in `backend/.env`, then restart the backend:
+The Company dashboard assistant uses the Gemini Developer API. Create an API key in [Google AI Studio](https://aistudio.google.com/apikey), put it in `backend/.env` as `GEMINI_API_KEY=...`, and keep `GEMINI_MODEL` set to a model available to your key (the current default is `gemini-3.1-flash-lite`). To discover and actually test an available text-generation model from PowerShell:
 
-**Hugging Face**
-1. Create a fine-grained token with Inference Providers permission at [Hugging Face token settings](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained).
-2. Set `CHAT_PROVIDER=huggingface`, `HF_TOKEN=hf_...`, and `HF_MODEL=Qwen/Qwen3-4B-Instruct-2507`. Verify the model is currently available to your account in the [Hugging Face Playground](https://huggingface.co/playground); provider availability, access, and billing/credits can vary. A valid token does not include free inference credits automatically.
+```powershell
+Set-Location .\backend
+npm run test:gemini
+```
 
-**Gemini alternative**
-Set `CHAT_PROVIDER=gemini`, `GEMINI_API_KEY=...`, and `GEMINI_MODEL=gemini-3.8-flash`.
+The check lists models available to that key and sends a tiny test prompt to up to five candidates, stopping at the first successful response. To test a specific model, run `node .\scripts\test-gemini.js gemini-model-name`. Put the printed working model in `GEMINI_MODEL` in `.env`, then restart the backend. Free-tier availability and quotas depend on model, account, and region; Google may use content from unpaid services to improve its products, so do not send sensitive data on the free tier.
 
-Never put provider tokens in frontend code or commit them. Recent chat messages are sent to the provider as context. The assistant has a product guide covering roles, workflows, model limitations, price/CO₂ estimates, demo listings, and available inventory actions. Clickable suggested questions and a built-in guide keep common help available if the model API cannot be reached; these responses are labeled separately. General answers cannot see live inventory or execute actions; those continue through the existing authenticated backend tools.
+Never put API keys in frontend code or commit them. Recent chat messages are sent to Gemini as context. Chat intent and account actions run locally in the backend without depending on the AI microservice. The assistant has a product guide covering roles, workflows, model limitations, price/CO₂ estimates, demo listings, and available inventory actions. Built-in guide answers still work if Gemini cannot be reached. General answers cannot see live inventory or execute actions; those continue through the existing authenticated backend tools.
 
 ### Optional demo marketplace data
 To add 50 clearly marked sample listings to the MongoDB database configured in `backend/.env`, open PowerShell:
@@ -56,6 +56,9 @@ The command is safe to rerun: it keeps existing records and fills the demo suppl
 
 ## Tests
 `cd backend && npm test` (Jest/Supertest-style unit tests) · `cd ai-service && pytest`
+
+## Continuous integration
+GitHub Actions runs backend tests, the frontend production build, and AI-service compile/tests on every push and pull request. The jobs run independently. CI uses lockfile-based Node installs and Python 3.11; it does not need application credentials, MongoDB, trained model weights, or external AI-provider access.
 
 ## Notes / honesty
 - Without trained weights the vision step runs in **demo mode** (heuristic), flagged in the API response. Fine-tune YOLO on a construction-materials dataset (steel, concrete, brick, wood, tiles, glass) and set `YOLO_WEIGHTS`.

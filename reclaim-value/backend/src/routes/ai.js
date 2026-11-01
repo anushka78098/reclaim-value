@@ -2,6 +2,7 @@ const r = require('express').Router(); const axios = require('axios'); const For
 const { auth, requireRole, wrap } = require('../middleware'); const { Material } = require('../models');
 const { createListing } = require('./listings'); const { saveImage } = require('../storage');
 const { generateAssistantReply } = require('../gemini');
+const { getAssistantIntent } = require('../assistantIntent');
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 r.use(auth);
 
@@ -40,13 +41,8 @@ r.post('/agent', requireRole('Company'), wrap(async (req, res) => {
     entry && ['user', 'assistant'].includes(entry.role) && typeof entry.text === 'string',
   ).map((entry) => ({ role: entry.role, text: entry.text.slice(0, 1000) }));
 
-  const intent = (await axios.post(`${process.env.AI_URL}/agent`, { text: message }, { timeout: 8000 })
-    .catch(() => { throw Object.assign(new Error('AI service unavailable'), { status: 502 }); })).data;
-  if (!intent.tool) return res.json(await generateAssistantReply({ message, history: safeHistory }));
-  if (!Object.hasOwn(tools, intent.tool)) {
-    console.error('AI service returned an unsupported assistant tool:', intent.tool);
-    throw Object.assign(new Error('Assistant requested an unsupported action'), { status: 502 });
-  }
+  const intent = getAssistantIntent(message);
+  if (!intent) return res.json(await generateAssistantReply({ message, history: safeHistory }));
   res.json({ source: 'action', tool: intent.tool, ...(await tools[intent.tool](req.user, intent.args)) });
 }));
 module.exports = r;

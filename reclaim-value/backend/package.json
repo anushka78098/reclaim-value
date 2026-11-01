@@ -1,7 +1,27 @@
 {
-  "name": "reclaim-value-backend", "version": "1.0.0", "main": "src/server.js",
-  "scripts": { "dev": "node --watch src/server.js", "start": "node src/server.js", "test": "jest", "seed:demo": "node scripts/seedDemoListings.js" },
-  "dependencies": { "axios": "^1.7.0", "bcryptjs": "^2.4.3", "cloudinary": "^2.5.0", "cors": "^2.8.5", "dotenv": "^16.4.5",
-    "express": "^4.19.2", "form-data": "^4.0.0", "jsonwebtoken": "^9.0.2", "mongoose": "^8.5.0", "multer": "^1.4.5-lts.1" },
-  "devDependencies": { "jest": "^29.7.0" }
+  "name": "reclaim-value-backend",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "jest",
+    "test:gemini": "node scripts/test-gemini.js",
+    "seed:demo": "node scripts/seedDemoListings.js"
+  },
+  "dependencies": {
+    "axios": "^1.21.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "form-data": "^4.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0"
+  }
 }
